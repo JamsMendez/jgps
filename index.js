@@ -13,7 +13,7 @@ var events = _interopRequire(require("events"));
 var SerialPort = serialport.SerialPort;
 
 var JGPS = (function () {
-  function JGPS(port, baudrate) {
+  function JGPS(options) {
     _classCallCheck(this, JGPS);
 
     events.EventEmitter.call(this);
@@ -22,16 +22,18 @@ var JGPS = (function () {
     this.collected = [];
     this.gps = {};
 
-    if (!port) {
-      port = "/dev/ttyO0";
+    if (options) {
+      for (var key in options) {
+        this[key] = options[key];
+      }
+    } else {
+      this.port = "/dev/ttyO*";
+      this.baudrate = 9600;
     }
+    var self = this;
 
-    if (!baudrate) {
-      baudrate = 9600;
-    }
-
-    this.serialPort = new SerialPort(port, {
-      baudrate: baudrate,
+    this.serialPort = new SerialPort(self.port, {
+      baudrate: self.baudrate,
       parser: serialport.parsers.readline("\n")
     });
 
@@ -211,7 +213,7 @@ var JGPS = (function () {
         });
 
         if (this.reads > 5 && this.collected.indexOf("GGA") > -1 && this.collected.indexOf("RMC") > -1) {
-          this.emit("location", this.gps);
+          this.emit("fix", this.gps);
           this.reads = 0;
           this.collected = [];
           this.gps = {};

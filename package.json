@@ -2,7 +2,7 @@
   "name": "jgps",
   "version": "1.0.0",
   "description": "logger GPS of serial port",
-  "main": "jgps.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,13 +11,12 @@
     "url": "https://github.com/JamsMendez/jgps"
   },
   "author": "José Angel Méndez Santiago",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/JamsMendez/jgps/issues"
   },
   "homepage": "https://github.com/JamsMendez/jgps",
   "dependencies": {
-    "serial": "0.0.8",
     "serialport": "^1.5.0"
   }
 }
