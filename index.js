@@ -19,7 +19,7 @@ var JGPS = (function () {
     events.EventEmitter.call(this);
 
     this.reads = 0;
-    this.collected = [];
+    this.collection = [];
     this.gps = {};
 
     if (options) {
@@ -37,10 +37,15 @@ var JGPS = (function () {
       parser: serialport.parsers.readline("\n")
     });
 
-    this.serialPort.on("open", function () {
-      serialPort.on("data", function (data) {
-        parseGPSData(data);
-      });
+    this.serialPort.on("open", function (err) {
+      if (!err) {
+        self.emit("open");
+        self.serialPort.on("data", function (data) {
+          parseGPSData(data);
+        });
+      } else {
+        self.emit("error", err);
+      }
     });
   }
 
@@ -66,6 +71,7 @@ var JGPS = (function () {
     },
     parseGPSData: {
       value: function parseGPSData(data) {
+
         var line = data.split(",");
 
         if (line[0].slice(0, 1) != "$") {
@@ -207,15 +213,15 @@ var JGPS = (function () {
         });
 
         this.reads++;
-        this.collected.push(type);
-        this.collected = this.collected.filter(function (v, i, s) {
+        this.collection.push(type);
+        this.collection = this.collection.filter(function (v, i, s) {
           return self.onlyUnique(v, i, s);
         });
 
-        if (this.reads > 5 && this.collected.indexOf("GGA") > -1 && this.collected.indexOf("RMC") > -1) {
+        if (this.reads > 5 && this.collection.indexOf("GGA") > -1 && this.collection.indexOf("RMC") > -1) {
           this.emit("fix", this.gps);
           this.reads = 0;
-          this.collected = [];
+          this.collection = [];
           this.gps = {};
         }
       },
