@@ -208,17 +208,15 @@ var JGPS = (function () {
       this.collection = [];
       this.gps = {};
     }
-
-    return JGPS;
-
   }
 
   function onlyUnique (value, index, s) {
     return s.indexOf(value) === index;
   }
 
-});
+  JGPS.prototype.__proto__ = events.EventEmitter.prototype;
 
-JGPS.prototype.__proto__ = events.EventEmitter.prototype;
+  return JGPS;
+});
 
 module.exports = JGPS;
