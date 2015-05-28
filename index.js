@@ -133,7 +133,7 @@ var JGPS = (function () {
           this.gps.satellites = [];
         }
 
-        for (let i = 0; i <= 11; i++) {
+        for (var i = 0; i <= 11; i++) {
           var id = line.shift();
           if (id == ''){
             this.gps.satellites[i] = {};
@@ -159,7 +159,7 @@ var JGPS = (function () {
           this.gps.satellites = [];
         }
 
-        for (let i = 0; i <= 3; i++) {
+        for (var i = 0; i <= 3; i++) {
           if (this.gps.satellites[i] == undefined) {
             this.gps.satellites[i] = {};
           }
