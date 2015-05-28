@@ -5,13 +5,13 @@ var SerialPort = serialport.SerialPort;
 
 var JGPS = (function () {
 
+  var reads = 0;
+  var collection = [];
+  var gps = {};
+
   function JGPS (options) {
 
     events.EventEmitter.call(this);
-
-    this.reads = 0;
-    this.collection = [];
-    this.gps = {};
 
     if (options) {
       for(var key in options){
@@ -58,108 +58,108 @@ var JGPS = (function () {
       switch (type) {
 
         case "GGA":
-          this.gps.time               = line.shift();
-          this.gps.latitude           = latLngToDecimal(line.shift());
-          this.gps.lat_ref            = line.shift();
-          this.gps.longitude          = latLngToDecimal(line.shift());
-          this.gps.long_ref           = line.shift();
-          this.gps.quality            = line.shift();
-          this.gps.num_sat            = parseInt(line.shift());
-          this.gps.hdop               = line.shift();
-          this.gps.altitude           = line.shift();
-          this.gps.alt_unit           = line.shift();
-          this.gps.height_geoid       = line.shift();
-          this.gps.height_geoid_unit  = line.shift();
-          this.gps.last_dgps          = line.shift();
-          this.gps.dgps               = line.shift();
+          gps.time               = line.shift();
+          gps.latitude           = latLngToDecimal(line.shift());
+          gps.lat_ref            = line.shift();
+          gps.longitude          = latLngToDecimal(line.shift());
+          gps.long_ref           = line.shift();
+          gps.quality            = line.shift();
+          gps.num_sat            = parseInt(line.shift());
+          gps.hdop               = line.shift();
+          gps.altitude           = line.shift();
+          gps.alt_unit           = line.shift();
+          gps.height_geoid       = line.shift();
+          gps.height_geoid_unit  = line.shift();
+          gps.last_dgps          = line.shift();
+          gps.dgps               = line.shift();
         break;
 
         case "RMC":
-          this.gps.time          = line.shift();
-          this.gps.validity      = line.shift();
-          this.gps.latitude      = latLngToDecimal(line.shift());
-          this.gps.lat_ref       = line.shift();
-          this.gps.longitude     = latLngToDecimal(line.shift());
-          this.gps.long_ref      = line.shift();
-          this.gps.speed         = line.shift();
-          this.gps.course        = line.shift();
-          this.gps.date          = line.shift();
-          this.gps.variation     = line.shift();
-          this.gps.var_direction = line.shift();
+          gps.time          = line.shift();
+          gps.validity      = line.shift();
+          gps.latitude      = latLngToDecimal(line.shift());
+          gps.lat_ref       = line.shift();
+          gps.longitude     = latLngToDecimal(line.shift());
+          gps.long_ref      = line.shift();
+          gps.speed         = line.shift();
+          gps.course        = line.shift();
+          gps.date          = line.shift();
+          gps.variation     = line.shift();
+          gps.var_direction = line.shift();
         break;
 
         case "GLL":
-          this.gps.latitude    = latLngToDecimal(line.shift());
-          this.gps.lat_ref     = line.shift();
-          this.gps.longitude   = latLngToDecimal(line.shift());
-          this.gps.long_ref    = line.shift();
-          this.gps.time        = line.shift();
+          gps.latitude    = latLngToDecimal(line.shift());
+          gps.lat_ref     = line.shift();
+          gps.longitude   = latLngToDecimal(line.shift());
+          gps.long_ref    = line.shift();
+          gps.time        = line.shift();
         break;
 
         case "RMA":
           line.shift();
-          this.gps.latitude    = latLngToDecimal(line.shift());
-          this.gps.lat_ref     = line.shift();
-          this.gps.longitude   = latLngToDecimal(line.shift());
-          this.gps.long_ref    = line.shift();
+          gps.latitude    = latLngToDecimal(line.shift());
+          gps.lat_ref     = line.shift();
+          gps.longitude   = latLngToDecimal(line.shift());
+          gps.long_ref    = line.shift();
           line.shift();
           line.shift();
-          this.gps.speed          = line.shift();
-          this.gps.course         = line.shift();
-          this.gps.variation      = line.shift();
-          this.gps.var_direction  = line.shift();
+          gps.speed          = line.shift();
+          gps.course         = line.shift();
+          gps.variation      = line.shift();
+          gps.var_direction  = line.shift();
         break;
 
         case "GSA":
-          this.gps.mode            = line.shift();
-          this.gps.mode_dimension  = line.shift();
+          gps.mode            = line.shift();
+          gps.mode_dimension  = line.shift();
 
-          if(this.gps.satellites == undefined) {
-            this.gps.satellites = [];
+          if(gps.satellites == undefined) {
+            gps.satellites = [];
           }
 
           for (var i = 0; i <= 11; i++) {
             var id = line.shift();
             if (id == ''){
-              this.gps.satellites[i] = {};
+              gps.satellites[i] = {};
             } else {
-              if(this.gps.satellites[i] == undefined) {
-                this.gps.satellites[i] = {};
+              if(gps.satellites[i] == undefined) {
+                gps.satellites[i] = {};
               }
-              this.gps.satellites[i].id = id;
+              gps.satellites[i].id = id;
             }
           }
 
-          this.gps.pdop = line.shift();
-          this.gps.hdop = line.shift();
-          this.gps.vdop = line.shift();
+          gps.pdop = line.shift();
+          gps.hdop = line.shift();
+          gps.vdop = line.shift();
         break;
 
         case "GSV":
-          this.gps.msg_count  = line.shift();
-          this.gps.msg_num    = line.shift();
-          this.gps.num_sat    = parseInt(line.shift());
+          gps.msg_count  = line.shift();
+          gps.msg_num    = line.shift();
+          gps.num_sat    = parseInt(line.shift());
 
-          if(this.gps.satellites == undefined) {
-            this.gps.satellites = [];
+          if(gps.satellites == undefined) {
+            gps.satellites = [];
           }
 
           for (var i = 0; i <= 3; i++) {
-            if (this.gps.satellites[i] == undefined) {
-              this.gps.satellites[i] = {};
+            if (gps.satellites[i] == undefined) {
+              gps.satellites[i] = {};
             }
-            this.gps.satellites[i].elevation  = line.shift();
-            this.gps.satellites[i].azimuth    = line.shift();
-            this.gps.satellites[i].snr        = line.shift();
+            gps.satellites[i].elevation  = line.shift();
+            gps.satellites[i].azimuth    = line.shift();
+            gps.satellites[i].snr        = line.shift();
           }
         break;
 
         case "HDT":
-          this.gps.heading  = line.shift();
+          gps.heading  = line.shift();
         break;
 
         case "ZDA":
-          this.gps.time  = line.shift();
+          gps.time  = line.shift();
           var day   = line.shift();
           var month = line.shift();
           var year  = line.shift();
@@ -167,9 +167,9 @@ var JGPS = (function () {
             year = [2, 2];
           }
 
-          this.gps.date = day + month + year;
-          this.gps.local_hour_offset    = line.shift();
-          this.gps.local_minute_offset  = line.shift();
+          gps.date = day + month + year;
+          gps.local_hour_offset    = line.shift();
+          gps.local_minute_offset  = line.shift();
         break;
       }
 
@@ -181,17 +181,17 @@ var JGPS = (function () {
         }
       });
 
-      this.reads ++;
-      this.collection.push(type)
-      this.collection = this.collection.filter(function(v,i,s){
+      reads ++;
+      collection.push(type)
+      collection = collection.filter(function(v,i,s){
         return self.onlyUnique(v,i,s);
       });
 
-      if (this.reads > 5 && this.collection.indexOf('GGA') > -1 && this.collection.indexOf('RMC') > -1) {
+      if (reads > 5 && this.collection.indexOf('GGA') > -1 && collection.indexOf('RMC') > -1) {
         this.emit('fix', this.gps);
-        this.reads = 0;
-        this.collection = [];
-        this.gps = {};
+        reads = 0;
+        collection = [];
+        gps = {};
       }
     }
 
@@ -217,7 +217,7 @@ var JGPS = (function () {
   }
 
   return JGPS;
-  
+
 })();
 
 JGPS.prototype.__proto__ = events.EventEmitter.prototype;
