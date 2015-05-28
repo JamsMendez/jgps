@@ -1,11 +1,11 @@
-import serialport from 'serialport';
-import events     from 'events';
+var serialport = require('serialport');
+var events     = require('events');
 
 var SerialPort = serialport.SerialPort;
 
-class JGPS {
+var JGPS = (function () {
 
-  constructor (options) {
+  function JGPS (options) {
     events.EventEmitter.call(this);
 
     this.reads = 0;
@@ -39,7 +39,7 @@ class JGPS {
     });
   }
 
-  static latLngToDecimal (coord) {
+  function latLngToDecimal (coord) {
     if (coord == undefined) return;
     var negative = (parseInt(coord) < 0);
     var decimal = null;
@@ -54,7 +54,7 @@ class JGPS {
     return decimal;
   }
 
-  static parseGPSData (data) {
+  function parseGPSData (data) {
 
     var line = data.split(',');
 
@@ -209,13 +209,15 @@ class JGPS {
       this.gps = {};
     }
 
+    return JGPS;
+
   }
 
-  static onlyUnique (value, index, s) {
+  function onlyUnique (value, index, s) {
     return s.indexOf(value) === index;
   }
 
-}
+});
 
 JGPS.prototype.__proto__ = events.EventEmitter.prototype;
 
